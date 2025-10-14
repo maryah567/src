@@ -1,43 +1,62 @@
 import React, { useState } from "react";
 import "./Explore.css";
 
-const Explore = () => {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState(null);
+const posts = [
+  { id: 1, title: "Sewing" },
+  { id: 2, title: "Python with Jane" },
+  { id: 3, title: "Cooking" },
+  { id: 4, title: "Guitar Lessons" },
+  { id: 5, title: "Harmonica" },
+  { id: 6, title: "Artsy Crafts" },
+  { id: 7, title: "Creative Painting" },
+  { id: 8, title: "Piano" },
+  { id: 9, title: "Memes Making" },
+  { id: 10, title: "Math Fun" },
+  { id: 11, title: "Gardening" },
+  { id: 12, title: "Dancing" },
+];
 
-  const handleSearch = async () => {
-    if (!query) return;
-    try {
-      const response = await fetch(`http://127.0.0.1:8000/search?query=${query}`);
-      const data = await response.json();
-      setResults(data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
+function Explore() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState([]);
+
+  const handleSearch = () => {
+    const filtered = posts.filter((p) =>
+      p.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setResults(filtered);
   };
 
+  const displayPosts = results.length > 0 || searchTerm ? results : posts;
+
   return (
-    <div className="explore-container">
-      <h1>Explore Page</h1>
+    <main className="explore-main">
       <div className="search-bar">
         <input
           type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search here..."
+          placeholder="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
         <button onClick={handleSearch}>Search</button>
       </div>
 
-      <div className="results">
-        {results ? (
-          <pre>{JSON.stringify(results, null, 2)}</pre>
-        ) : (
-          <p>No results yet.</p>
-        )}
-      </div>
-    </div>
+      {searchTerm && results.length === 0 ? (
+        <p className="no-results">No results found for “{searchTerm}”.</p>
+      ) : (
+        <div className="posts-grid">
+          {displayPosts.map((post) => (
+            <div key={post.id} className="post-card">
+              <div className="post-icon">🎞️</div>
+              <p>{post.title}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </main>
   );
-};
+}
 
 export default Explore;
+
